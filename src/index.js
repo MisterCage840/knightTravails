@@ -1,13 +1,14 @@
 const node = (position, parent = null) => {
   const distance = parent ? parent.distance + 1 : 0;
-  const isVisited = false;
-
   const getPosition = () => position;
   const getParent = () => parent;
-  const getVisitStatus = () => isVisited;
   const getDistance = () => distance;
 
-  return { getPosition, getParent, getDistance, getVisitStatus };
+  return {
+    getPosition,
+    getParent,
+    getDistance,
+  };
 };
 
 const getKnightMoves = ([x, y]) => {
@@ -32,6 +33,7 @@ const BFS = (start, end) => {
 
   let startNode = node(start);
 
+  let visitedPositions = [];
   queue.push(startNode);
 
   while (queue.length > 0) {
@@ -43,15 +45,22 @@ const BFS = (start, end) => {
       let node = cur;
       while (node) {
         path.push(node.getPosition());
-        node = cur.getParent();
+        node = node.getParent();
       }
+      path.reverse();
       return path;
     } else {
       let possibleMoves = getKnightMoves(cur.getPosition());
       for (let move of possibleMoves) {
         let enqueueNode = node(move, cur);
-        if (!enqueueNode.getVisitStatus()) {
+        let enqueueNodePos = enqueueNode.getPosition();
+        const visitedAlready = visitedPositions.some(
+          (enqueueNodePos) =>
+            move[0] == enqueueNodePos[0] && move[1] == enqueueNodePos[0][1],
+        );
+        if (!visitedAlready) {
           queue.push(enqueueNode);
+          visitedPositions.push(move);
         }
       }
     }
@@ -59,4 +68,4 @@ const BFS = (start, end) => {
   return null;
 };
 
-console.log(BFS([0, 0], [3, 3]));
+console.log(BFS([6, 0], [3, 3]));
